@@ -15,6 +15,7 @@ res2 = 60.;
 res3 = .500;
 res4 = 60.52E2;
 str = "Hello world";
+a3 = 3b;
 
 if (m==n) { 
     if (m >= n) 

@@ -1,6 +1,6 @@
 import sys
 from scanner import MyLexer
-from parser import MyParser
+from mparser import MyParser
 
 if __name__ == "__main__":
     try:

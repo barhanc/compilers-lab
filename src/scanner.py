@@ -31,7 +31,7 @@ class MyLexer(Lexer):
     GT = r">"
     NE = r"!="
 
-    @_(r"[+-]?([0-9]+\.([0-9]*)?|[.][0-9]+)(E[+-]?\d+)?")
+    @_(r"([0-9]+\.([0-9]*)?|\.[0-9]+)(E[+-]?\d+)?")
     def FLOATNUM(self, t):
         e = t.value.find("E")
         if e == -1:
@@ -46,7 +46,8 @@ class MyLexer(Lexer):
         t.value = int(t.value)
         return t
 
-    @_(r'".*"')
+    # [^"]*
+    @_(r'".*?"')
     def STRING(self, t):
         t.value = t.value[1:-1]
         return t

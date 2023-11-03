@@ -14,7 +14,7 @@ class MyParser(Parser):
     precedence = (
         ("right", "=", IADD, ISUB, IMUL, IDIV),
         ("nonassoc", ":"),
-        ("left", EQ, NE, GT, GE, LT, LE),
+        ("nonassoc", EQ, NE, GT, GE, LT, LE),
         ("left", ADD, SUB, DADD, DSUB),
         ("left", MUL, DIV, DMUL, DDIV),
         ("right", UMINUS),

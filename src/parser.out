@@ -1,7 +1,7 @@
 Grammar:
 
 Rule 0     S' -> program
-Rule 1     program -> statement_sequence
+Rule 1     program -> statementseq
 Rule 2     expr -> array
 Rule 3     expr -> expr [ exprseq ]  [precedence=left, level=8]
 Rule 4     expr -> ZEROS ( expr )
@@ -12,7 +12,7 @@ Rule 8     expr -> FLOATNUM
 Rule 9     expr -> INTNUM
 Rule 10    expr -> ID
 Rule 11    expr -> expr '  [precedence=left, level=7]
-Rule 12    expr -> SUB expr  [precedence=left, level=4]
+Rule 12    expr -> SUB expr  [precedence=right, level=6]
 Rule 13    expr -> ( expr )
 Rule 14    expr -> expr : expr  [precedence=nonassoc, level=2]
 Rule 15    expr -> expr LE expr  [precedence=left, level=3]
@@ -21,20 +21,20 @@ Rule 17    expr -> expr GE expr  [precedence=left, level=3]
 Rule 18    expr -> expr GT expr  [precedence=left, level=3]
 Rule 19    expr -> expr NE expr  [precedence=left, level=3]
 Rule 20    expr -> expr EQ expr  [precedence=left, level=3]
-Rule 21    expr -> expr DDIV expr  [precedence=left, level=6]
-Rule 22    expr -> expr DMUL expr  [precedence=left, level=6]
-Rule 23    expr -> expr DSUB expr  [precedence=left, level=5]
-Rule 24    expr -> expr DADD expr  [precedence=left, level=5]
-Rule 25    expr -> expr DIV expr  [precedence=left, level=6]
-Rule 26    expr -> expr MUL expr  [precedence=left, level=6]
-Rule 27    expr -> expr SUB expr  [precedence=left, level=5]
-Rule 28    expr -> expr ADD expr  [precedence=left, level=5]
+Rule 21    expr -> expr DDIV expr  [precedence=left, level=5]
+Rule 22    expr -> expr DMUL expr  [precedence=left, level=5]
+Rule 23    expr -> expr DSUB expr  [precedence=left, level=4]
+Rule 24    expr -> expr DADD expr  [precedence=left, level=4]
+Rule 25    expr -> expr DIV expr  [precedence=left, level=5]
+Rule 26    expr -> expr MUL expr  [precedence=left, level=5]
+Rule 27    expr -> expr SUB expr  [precedence=left, level=4]
+Rule 28    expr -> expr ADD expr  [precedence=left, level=4]
 Rule 29    exprseq -> exprseq , expr
 Rule 30    exprseq -> expr
 Rule 31    array -> [ elements ]
 Rule 32    elements -> elements , expr
 Rule 33    elements -> expr
-Rule 34    statement -> { statement_sequence }
+Rule 34    statement -> { statementseq }
 Rule 35    statement -> FOR ID = exprseq statement  [precedence=right, level=1]
 Rule 36    statement -> WHILE ( expr ) statement
 Rule 37    statement -> IF ( expr ) statement ELSE statement  [precedence=nonassoc, level=10]
@@ -48,8 +48,8 @@ Rule 44    statement -> CONTINUE ;
 Rule 45    statement -> BREAK ;
 Rule 46    statement -> RETURN exprseq ;
 Rule 47    statement -> PRINT exprseq ;
-Rule 48    statement_sequence -> statement
-Rule 49    statement_sequence -> statement statement_sequence
+Rule 48    statementseq -> statement
+Rule 49    statementseq -> statement statementseq
 
 Terminals, with rules where they appear:
 
@@ -107,16 +107,16 @@ expr                 : 3 4 5 6 11 12 13 14 14 15 15 16 16 17 17 18 18 19 19 20 2
 exprseq              : 3 29 35 46 47
 program              : 0
 statement            : 35 36 37 37 38 48 49
-statement_sequence   : 1 34 49
+statementseq         : 1 34 49
 
 
 state 0
 
     (0) S' -> . program
-    (1) program -> . statement_sequence
-    (48) statement_sequence -> . statement
-    (49) statement_sequence -> . statement statement_sequence
-    (34) statement -> . { statement_sequence }
+    (1) program -> . statementseq
+    (48) statementseq -> . statement
+    (49) statementseq -> . statement statementseq
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -178,7 +178,7 @@ state 0
     [               shift and go to state 16
 
     program                        shift and go to state 1
-    statement_sequence             shift and go to state 2
+    statementseq                   shift and go to state 2
     statement                      shift and go to state 3
     expr                           shift and go to state 9
     array                          shift and go to state 15
@@ -190,17 +190,17 @@ state 1
 
 state 2
 
-    (1) program -> statement_sequence .
-    $end            reduce using rule 1 (program -> statement_sequence .)
+    (1) program -> statementseq .
+    $end            reduce using rule 1 (program -> statementseq .)
 
 
 state 3
 
-    (48) statement_sequence -> statement .
-    (49) statement_sequence -> statement . statement_sequence
-    (48) statement_sequence -> . statement
-    (49) statement_sequence -> . statement statement_sequence
-    (34) statement -> . { statement_sequence }
+    (48) statementseq -> statement .
+    (49) statementseq -> statement . statementseq
+    (48) statementseq -> . statement
+    (49) statementseq -> . statement statementseq
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -242,8 +242,8 @@ state 3
     (27) expr -> . expr SUB expr
     (28) expr -> . expr ADD expr
     (31) array -> . [ elements ]
-    $end            reduce using rule 48 (statement_sequence -> statement .)
-    }               reduce using rule 48 (statement_sequence -> statement .)
+    $end            reduce using rule 48 (statementseq -> statement .)
+    }               reduce using rule 48 (statementseq -> statement .)
     {               shift and go to state 4
     FOR             shift and go to state 5
     WHILE           shift and go to state 7
@@ -264,16 +264,16 @@ state 3
     [               shift and go to state 16
 
     statement                      shift and go to state 3
-    statement_sequence             shift and go to state 24
+    statementseq                   shift and go to state 24
     expr                           shift and go to state 9
     array                          shift and go to state 15
 
 state 4
 
-    (34) statement -> { . statement_sequence }
-    (48) statement_sequence -> . statement
-    (49) statement_sequence -> . statement statement_sequence
-    (34) statement -> . { statement_sequence }
+    (34) statement -> { . statementseq }
+    (48) statementseq -> . statement
+    (49) statementseq -> . statement statementseq
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -334,7 +334,7 @@ state 4
     (               shift and go to state 8
     [               shift and go to state 16
 
-    statement_sequence             shift and go to state 25
+    statementseq                   shift and go to state 25
     statement                      shift and go to state 3
     expr                           shift and go to state 9
     array                          shift and go to state 15
@@ -907,14 +907,14 @@ state 23
 
 state 24
 
-    (49) statement_sequence -> statement statement_sequence .
-    $end            reduce using rule 49 (statement_sequence -> statement statement_sequence .)
-    }               reduce using rule 49 (statement_sequence -> statement statement_sequence .)
+    (49) statementseq -> statement statementseq .
+    $end            reduce using rule 49 (statementseq -> statement statementseq .)
+    }               reduce using rule 49 (statementseq -> statement statementseq .)
 
 
 state 25
 
-    (34) statement -> { statement_sequence . }
+    (34) statement -> { statementseq . }
     }               shift and go to state 63
 
 
@@ -2396,6 +2396,14 @@ state 62
     GT              reduce using rule 12 (expr -> SUB expr .)
     NE              reduce using rule 12 (expr -> SUB expr .)
     EQ              reduce using rule 12 (expr -> SUB expr .)
+    DDIV            reduce using rule 12 (expr -> SUB expr .)
+    DMUL            reduce using rule 12 (expr -> SUB expr .)
+    DSUB            reduce using rule 12 (expr -> SUB expr .)
+    DADD            reduce using rule 12 (expr -> SUB expr .)
+    DIV             reduce using rule 12 (expr -> SUB expr .)
+    MUL             reduce using rule 12 (expr -> SUB expr .)
+    SUB             reduce using rule 12 (expr -> SUB expr .)
+    ADD             reduce using rule 12 (expr -> SUB expr .)
     )               reduce using rule 12 (expr -> SUB expr .)
     ;               reduce using rule 12 (expr -> SUB expr .)
     ,               reduce using rule 12 (expr -> SUB expr .)
@@ -2416,40 +2424,32 @@ state 62
     INTNUM          reduce using rule 12 (expr -> SUB expr .)
     ID              reduce using rule 12 (expr -> SUB expr .)
     (               reduce using rule 12 (expr -> SUB expr .)
-    DDIV            shift and go to state 43
-    DMUL            shift and go to state 44
-    DSUB            shift and go to state 45
-    DADD            shift and go to state 46
-    DIV             shift and go to state 47
-    MUL             shift and go to state 48
-    SUB             shift and go to state 49
-    ADD             shift and go to state 50
 
 
 state 63
 
-    (34) statement -> { statement_sequence } .
-    {               reduce using rule 34 (statement -> { statement_sequence } .)
-    FOR             reduce using rule 34 (statement -> { statement_sequence } .)
-    WHILE           reduce using rule 34 (statement -> { statement_sequence } .)
-    IF              reduce using rule 34 (statement -> { statement_sequence } .)
-    CONTINUE        reduce using rule 34 (statement -> { statement_sequence } .)
-    BREAK           reduce using rule 34 (statement -> { statement_sequence } .)
-    RETURN          reduce using rule 34 (statement -> { statement_sequence } .)
-    PRINT           reduce using rule 34 (statement -> { statement_sequence } .)
-    ZEROS           reduce using rule 34 (statement -> { statement_sequence } .)
-    ONES            reduce using rule 34 (statement -> { statement_sequence } .)
-    EYE             reduce using rule 34 (statement -> { statement_sequence } .)
-    STRING          reduce using rule 34 (statement -> { statement_sequence } .)
-    FLOATNUM        reduce using rule 34 (statement -> { statement_sequence } .)
-    INTNUM          reduce using rule 34 (statement -> { statement_sequence } .)
-    ID              reduce using rule 34 (statement -> { statement_sequence } .)
-    SUB             reduce using rule 34 (statement -> { statement_sequence } .)
-    (               reduce using rule 34 (statement -> { statement_sequence } .)
-    [               reduce using rule 34 (statement -> { statement_sequence } .)
-    $end            reduce using rule 34 (statement -> { statement_sequence } .)
-    }               reduce using rule 34 (statement -> { statement_sequence } .)
-    ELSE            reduce using rule 34 (statement -> { statement_sequence } .)
+    (34) statement -> { statementseq } .
+    {               reduce using rule 34 (statement -> { statementseq } .)
+    FOR             reduce using rule 34 (statement -> { statementseq } .)
+    WHILE           reduce using rule 34 (statement -> { statementseq } .)
+    IF              reduce using rule 34 (statement -> { statementseq } .)
+    CONTINUE        reduce using rule 34 (statement -> { statementseq } .)
+    BREAK           reduce using rule 34 (statement -> { statementseq } .)
+    RETURN          reduce using rule 34 (statement -> { statementseq } .)
+    PRINT           reduce using rule 34 (statement -> { statementseq } .)
+    ZEROS           reduce using rule 34 (statement -> { statementseq } .)
+    ONES            reduce using rule 34 (statement -> { statementseq } .)
+    EYE             reduce using rule 34 (statement -> { statementseq } .)
+    STRING          reduce using rule 34 (statement -> { statementseq } .)
+    FLOATNUM        reduce using rule 34 (statement -> { statementseq } .)
+    INTNUM          reduce using rule 34 (statement -> { statementseq } .)
+    ID              reduce using rule 34 (statement -> { statementseq } .)
+    SUB             reduce using rule 34 (statement -> { statementseq } .)
+    (               reduce using rule 34 (statement -> { statementseq } .)
+    [               reduce using rule 34 (statement -> { statementseq } .)
+    $end            reduce using rule 34 (statement -> { statementseq } .)
+    }               reduce using rule 34 (statement -> { statementseq } .)
+    ELSE            reduce using rule 34 (statement -> { statementseq } .)
 
 
 state 64
@@ -4109,7 +4109,7 @@ state 97
 
     (35) statement -> FOR ID = exprseq . statement
     (29) exprseq -> exprseq . , expr
-    (34) statement -> . { statement_sequence }
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -4178,7 +4178,7 @@ state 97
 state 98
 
     (36) statement -> WHILE ( expr ) . statement
-    (34) statement -> . { statement_sequence }
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -4424,7 +4424,7 @@ state 105
 
     (37) statement -> IF ( expr ) . statement ELSE statement
     (38) statement -> IF ( expr ) . statement
-    (34) statement -> . { statement_sequence }
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement
@@ -4813,7 +4813,7 @@ state 113
 state 114
 
     (37) statement -> IF ( expr ) statement ELSE . statement
-    (34) statement -> . { statement_sequence }
+    (34) statement -> . { statementseq }
     (35) statement -> . FOR ID = exprseq statement
     (36) statement -> . WHILE ( expr ) statement
     (37) statement -> . IF ( expr ) statement ELSE statement

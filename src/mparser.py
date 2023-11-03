@@ -7,7 +7,7 @@ class MyParser(Parser):
     tokens = MyLexer.tokens
     start = "program"
 
-    @_("statement_sequence")
+    @_("statementseq")
     def program(self, p):
         return p
 
@@ -15,9 +15,9 @@ class MyParser(Parser):
         ("right", "=", IADD, ISUB, IMUL, IDIV),
         ("nonassoc", ":"),
         ("left", EQ, NE, GT, GE, LT, LE),
-        ("left", UMINUS),
         ("left", ADD, SUB, DADD, DSUB),
         ("left", MUL, DIV, DMUL, DDIV),
+        ("right", UMINUS),
         ("left", TRANSPOSE),
         ("left", INDEX),
         ("nonassoc", IFX),
@@ -136,10 +136,10 @@ class MyParser(Parser):
     def statement(self, p):
         return p
 
-    @_('"{" statement_sequence "}"')
+    @_('"{" statementseq "}"')
     def statement(self, p):
         return p
 
-    @_("statement statement_sequence", "statement")
-    def statement_sequence(self, p):
+    @_("statement statementseq", "statement")
+    def statementseq(self, p):
         return p

@@ -5,21 +5,67 @@ from scanner import MyLexer
 class MyParser(Parser):
     debugfile = "parser.out"
     tokens = MyLexer.tokens
-    start = "program"
+    start = "statementseq"
 
-    @_("statementseq")
-    def program(self, p):
+    # ==============================================================================================
+    # Statements
+
+    @_("statement statementseq", "statement")
+    def statementseq(self, p):
         return p
 
+    @_('PRINT exprseq ";"', 'RETURN exprseq ";"')
+    def statement(self, p):
+        return p
+
+    @_('BREAK ";"', 'CONTINUE ";"')
+    def statement(self, p):
+        return p
+
+    assignment = [
+        'ID "=" expr ";"',
+        'ID IADD expr ";"',
+        'ID ISUB expr ";"',
+        'ID IMUL expr ";"',
+        'ID IDIV expr ";"',
+        'ID "[" exprseq "]" "=" expr ";"',
+        'ID "[" exprseq "]" IADD expr ";"',
+        'ID "[" exprseq "]" ISUB expr ";"',
+        'ID "[" exprseq "]" IMUL expr ";"',
+        'ID "[" exprseq "]" IDIV expr ";"',
+    ]
+
+    @_(*assignment)
+    def statement(self, p):
+        return p
+
+    @_(
+        'IF "(" expr ")" statement %prec IFX',
+        'IF "(" expr ")" statement ELSE statement',
+    )
+    def statement(self, p):
+        return p
+
+    @_('WHILE "(" expr ")" statement')
+    def statement(self, p):
+        return p
+
+    @_('FOR ID "=" expr ":" expr statement')
+    def statement(self, p):
+        return p
+
+    @_('"{" statementseq "}"')
+    def statement(self, p):
+        return p
+
+    # Expressions
+
     precedence = (
-        ("right", "=", IADD, ISUB, IMUL, IDIV),
-        ("nonassoc", ":"),
         ("nonassoc", EQ, NE, GT, GE, LT, LE),
         ("left", ADD, SUB, DADD, DSUB),
         ("left", MUL, DIV, DMUL, DDIV),
         ("right", UMINUS),
         ("left", TRANSPOSE),
-        ("left", INDEX),
         ("nonassoc", IFX),
         ("nonassoc", ELSE),
     )
@@ -39,7 +85,6 @@ class MyParser(Parser):
         "expr GE expr",
         "expr LT expr",
         "expr LE expr",
-        'expr ":" expr',
     ]
 
     @_(*binary_expr)
@@ -81,65 +126,14 @@ class MyParser(Parser):
     def expr(self, p):
         return p
 
-    @_('expr "[" exprseq "]" %prec INDEX')
+    @_('expr "[" exprseq "]"')
     def expr(self, p):
         return p
 
-    @_('"[" elements "]"')
+    @_('"[" exprseq "]"')
     def array(self, p):
-        return p
-
-    @_("expr", 'elements "," expr')
-    def elements(self, p):
         return p
 
     @_("array")
     def expr(self, p):
-        return p
-
-    # ==============================================================================================
-    # Statements
-    # ==============================================================================================
-
-    @_('PRINT exprseq ";"', 'RETURN exprseq ";"')
-    def statement(self, p):
-        return p
-
-    @_('BREAK ";"', 'CONTINUE ";"')
-    def statement(self, p):
-        return p
-
-    assignment = [
-        'expr "=" expr ";"',
-        'expr IADD expr ";"',
-        'expr ISUB expr ";"',
-        'expr IMUL expr ";"',
-        'expr IDIV expr ";"',
-    ]
-
-    @_(*assignment)
-    def statement(self, p):
-        return p
-
-    @_(
-        'IF "(" expr ")" statement %prec IFX',
-        'IF "(" expr ")" statement ELSE statement',
-    )
-    def statement(self, p):
-        return p
-
-    @_('WHILE "(" expr ")" statement')
-    def statement(self, p):
-        return p
-
-    @_('FOR ID "=" exprseq statement')
-    def statement(self, p):
-        return p
-
-    @_('"{" statementseq "}"')
-    def statement(self, p):
-        return p
-
-    @_("statement statementseq", "statement")
-    def statementseq(self, p):
         return p

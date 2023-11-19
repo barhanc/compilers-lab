@@ -124,11 +124,6 @@ class Keyword(Statement):
     id: str
 
 
-# ...
-# fill out missing classes
-# ...
-
-
+@dataclass
 class Error(Node):
-    def __init__(self):
-        pass
+    pass

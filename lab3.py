@@ -18,7 +18,6 @@ if __name__ == "__main__":
 
     text = file.read()
     tokens = lexer.tokenize(text=text)
-    result = parser.parse(tokens)
 
-    for r in result:
-        r.printTree()
+    for a in parser.parse(tokens):
+        a.printTree()

@@ -107,7 +107,7 @@ class While(Statement):
 
 @dataclass
 class For(Statement):
-    id: Expression
+    id: Id
     start: Expression
     end: Expression
     body: Statement

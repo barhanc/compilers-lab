@@ -13,7 +13,12 @@ if __name__ == "__main__":
         print("Cannot open {0} file".format(filename))
         sys.exit(0)
 
-    # parser = yacc.yacc(module=MyParser())
-    # text = file.read()
-    # ast = parser.parse(text, lexer=MyLexer())
-    # ast.printTree()
+    lexer = MyLexer()
+    parser = MyParser()
+
+    text = file.read()
+    tokens = lexer.tokenize(text=text)
+    result = parser.parse(tokens)
+
+    for r in result:
+        r.printTree()

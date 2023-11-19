@@ -15,10 +15,109 @@ class TreePrinter:
     def printTree(self, indent=0):
         raise Exception("printTree not defined in class " + self.__class__.__name__)
 
+    @addToClass(AST.Id)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.name}")
+
     @addToClass(AST.IntNum)
     def printTree(self, indent=0):
-        pass
-        # fill in the body
+        print("|  " * indent + f"{self.value}")
+
+    @addToClass(AST.FloatNum)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.value}")
+
+    @addToClass(AST.String)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.value}")
+
+    @addToClass(AST.Block)
+    def printTree(self, indent=0):
+        for statement in self.statements:
+            statement.printTree(indent)
+
+    @addToClass(AST.Expression)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.val}")
+
+    @addToClass(AST.ExpressionSeq)
+    def printTree(self, indent=0):
+        for expr in self.elements:
+            expr.printTree(indent)
+
+    @addToClass(AST.BinExpr)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.op}")
+        self.left.printTree(indent + 1)
+        self.right.printTree(indent + 1)
+
+    @addToClass(AST.UnaryExpr)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.operator}")
+        self.operand.printTree(indent + 1)
+
+    @addToClass(AST.BuiltinExpr)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.id}")
+        self.arg.printTree(indent + 1)
+
+    @addToClass(AST.Vector)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"VECTOR")
+        for element in self.elements:
+            element.printTree(indent + 1)
+
+    @addToClass(AST.Assignment)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.op}")
+        self.id.printTree(indent + 1)
+        self.val.printTree(indent + 1)
+
+    @addToClass(AST.Reference)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"REF")
+        self.expr.printTree(indent + 1)
+        self.idx.printTree(indent + 1)
+
+    @addToClass(AST.RefAssignment)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.op}")
+        self.ref.printTree(indent + 1)
+        self.val.printTree(indent + 1)
+
+    @addToClass(AST.If)
+    def printTree(self, indent=0):
+        print("|  " * indent + "IF")
+        self.condition.printTree(indent + 1)
+        print("|  " * indent + "THEN")
+        self.body.printTree(indent + 1)
+        if self.else_body is not None:
+            print("|  " * indent + "ELSE")
+            self.else_body.printTree(indent + 1)
+
+    @addToClass(AST.While)
+    def printTree(self, indent=0):
+        print("|  " * indent + "WHILE")
+        self.condition.printTree(indent + 1)
+        self.body.printTree(indent + 1)
+
+    @addToClass(AST.For)
+    def printTree(self, indent=0):
+        print("|  " * indent + "FOR")
+        self.id.printTree(indent + 1)
+        print("|  " * (indent + 1) + "RANGE")
+        self.start.printTree(indent + 2)
+        self.end.printTree(indent + 2)
+        self.body.printTree(indent + 1)
+
+    @addToClass(AST.KeywordCall)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.id}".upper())
+        self.exprseq.printTree(indent + 1)
+
+    @addToClass(AST.Keyword)
+    def printTree(self, indent=0):
+        print("|  " * indent + f"{self.id}".upper())
 
     @addToClass(AST.Error)
     def printTree(self, indent=0):

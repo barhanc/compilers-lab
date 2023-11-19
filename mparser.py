@@ -1,5 +1,6 @@
 from sly import Parser
 from scanner import MyLexer
+from AST import *
 
 
 class MyParser(Parser):
@@ -10,17 +11,21 @@ class MyParser(Parser):
     # ==============================================================================================
     # Statements
 
-    @_("statement statementseq", "statement")
+    @_("statement statementseq")
     def statementseq(self, p):
-        return p
+        return [p.statement] + p.statementseq
+
+    @_("statement")
+    def statementseq(self, p):
+        return [p.statement]
 
     @_('PRINT exprseq ";"', 'RETURN exprseq ";"')
     def statement(self, p):
-        return p
+        return KeywordCall(p[0], p.exprseq)
 
     @_('BREAK ";"', 'CONTINUE ";"')
     def statement(self, p):
-        return p
+        return Keyword(p[0])
 
     assignment = [
         'ID "=" expr ";"',
@@ -28,6 +33,13 @@ class MyParser(Parser):
         'ID ISUB expr ";"',
         'ID IMUL expr ";"',
         'ID IDIV expr ";"',
+    ]
+
+    @_(*assignment)
+    def statement(self, p):
+        return Assignment(id=Id(p[0]), op=p[1], val=p[2])
+
+    ref_assignment = [
         'ID "[" exprseq "]" "=" expr ";"',
         'ID "[" exprseq "]" IADD expr ";"',
         'ID "[" exprseq "]" ISUB expr ";"',
@@ -35,28 +47,28 @@ class MyParser(Parser):
         'ID "[" exprseq "]" IDIV expr ";"',
     ]
 
-    @_(*assignment)
+    @_(*ref_assignment)
     def statement(self, p):
-        return p
+        return RefAssignment(op=p[4], ref=Reference(expr=Id(p[0]), idx=p.exprseq), val=p.expr)
 
     @_(
         'IF "(" expr ")" statement %prec IFX',
         'IF "(" expr ")" statement ELSE statement',
     )
     def statement(self, p):
-        return p
+        return If(p[2], p[4], p[6] if 6 < len(p) else None)
 
     @_('WHILE "(" expr ")" statement')
     def statement(self, p):
-        return p
+        return While(condition=p[2], body=p[4])
 
     @_('FOR ID "=" expr ":" expr statement')
     def statement(self, p):
-        return p
+        return For(id=Id(p[1]), start=p[3], end=p[5], body=p[6])
 
     @_('"{" statementseq "}"')
     def statement(self, p):
-        return p
+        return Block(p.statementseq)
 
     # Expressions
 
@@ -65,10 +77,20 @@ class MyParser(Parser):
         ("left", ADD, SUB, DADD, DSUB),
         ("left", MUL, DIV, DMUL, DDIV),
         ("right", UMINUS),
-        ("left", TRANSPOSE),
+        ("left", "'"),
         ("nonassoc", IFX),
         ("nonassoc", ELSE),
     )
+
+    # In this case, %prec UMINUS overrides the default rule precedence–setting it to that of UMINUS
+    # in the precedence specifier.
+    @_("SUB expr %prec UMINUS")
+    def expr(self, p):
+        return UnaryExpr(operator="SUB", operand=p.expr)
+
+    @_("""expr "'" """)
+    def expr(self, p):
+        return UnaryExpr(operator="TRANSPOSE", operand=p.expr)
 
     binary_expr = [
         "expr ADD expr",
@@ -89,34 +111,37 @@ class MyParser(Parser):
 
     @_(*binary_expr)
     def expr(self, p):
-        return p
+        return BinExpr(p[1], p[0], p[2])
 
     @_('"(" expr ")"')
     def expr(self, p):
-        return p
+        return Expression(p[1])
 
-    # In this case, %prec UMINUS overrides the default rule precedence–setting it to that of UMINUS
-    # in the precedence specifier.
-    @_("SUB expr %prec UMINUS")
+    @_("ID")
     def expr(self, p):
-        return p
+        return Id(p[0])
 
-    @_("""expr "'" %prec TRANSPOSE""")
+    @_("INTNUM")
     def expr(self, p):
-        return p
+        return IntNum(int(p[0]))
 
-    @_(
-        "ID",
-        "INTNUM",
-        "FLOATNUM",
-        "STRING",
-    )
+    @_("FLOATNUM")
     def expr(self, p):
-        return p
+        return FloatNum(float(p[0]))
 
-    @_("expr", ' exprseq "," expr')
+    @_("STRING")
+    def expr(self, p):
+        return String(p[0])
+
+    @_("expr")
     def exprseq(self, p):
-        return p
+        return ExpressionSeq([p.expr])
+
+    @_('exprseq "," expr')
+    def exprseq(self, p):
+        node = p.exprseq
+        node.elements.append(p.expr)
+        return node
 
     @_(
         'EYE "(" expr ")"',
@@ -124,16 +149,16 @@ class MyParser(Parser):
         'ZEROS "(" expr ")"',
     )
     def expr(self, p):
-        return p
+        return BuiltinExpr(id=p[0], arg=p[2])
 
     @_('expr "[" exprseq "]"')
     def expr(self, p):
-        return p
+        return Reference(p.expr, p.exprseq)
 
     @_('"[" exprseq "]"')
     def array(self, p):
-        return p
+        return Vector(elements=p.exprseq.elements)
 
     @_("array")
     def expr(self, p):
-        return p
+        return p.array

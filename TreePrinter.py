@@ -118,8 +118,3 @@ class TreePrinter:
     @addToClass(AST.Keyword)
     def printTree(self, indent=0):
         print("|  " * indent + f"{self.id}".upper())
-
-    @addToClass(AST.Error)
-    def printTree(self, indent=0):
-        pass
-        # fill in the body

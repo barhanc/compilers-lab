@@ -21,11 +21,11 @@ class MyParser(Parser):
 
     @_('PRINT exprseq ";"', 'RETURN exprseq ";"')
     def statement(self, p):
-        return KeywordCall(p[0], p.exprseq)
+        return OutputKeyword(p[0], p.exprseq)
 
     @_('BREAK ";"', 'CONTINUE ";"')
     def statement(self, p):
-        return Keyword(p[0])
+        return ControlTransferKeyword(p[0])
 
     assignment = [
         'ID "=" expr ";"',

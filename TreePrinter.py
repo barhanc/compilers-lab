@@ -110,12 +110,12 @@ class TreePrinter:
         self.end.printTree(indent + 2)
         self.body.printTree(indent + 1)
 
-    @addToClass(AST.KeywordCall)
+    @addToClass(AST.OutputKeyword)
     def printTree(self, indent=0):
         print("|  " * indent + f"{self.id}".upper())
         self.exprseq.printTree(indent + 1)
 
-    @addToClass(AST.Keyword)
+    @addToClass(AST.ControlTransferKeyword)
     def printTree(self, indent=0):
         print("|  " * indent + f"{self.id}".upper())
 

@@ -114,13 +114,13 @@ class For(Statement):
 
 
 @dataclass
-class KeywordCall(Statement):
+class OutputKeyword(Statement):
     id: str
     exprseq: ExpressionSeq
 
 
 @dataclass
-class Keyword(Statement):
+class ControlTransferKeyword(Statement):
     id: str
 
 

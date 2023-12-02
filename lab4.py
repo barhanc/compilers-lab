@@ -1,10 +1,11 @@
 import sys
 import sly.yacc as yacc
-from mparser import MyParser
-from scanner import MyLexer
-from TreePrinter import TreePrinter
 
-# from TypeChecker import TypeChecker
+from scanner import MyLexer
+from mparser import MyParser
+from TreePrinter import TreePrinter
+from TypeChecker import TypeChecker
+
 
 if __name__ == "__main__":
     try:
@@ -16,12 +17,15 @@ if __name__ == "__main__":
 
     lexer = MyLexer()
     parser = MyParser()
+    typeChecker = TypeChecker()
 
     text = file.read()
     tokens = lexer.tokenize(text=text)
 
-    # ast = parser.parse(text, lexer=Mparser.scanner)
-
-    # # Below code shows how to use visitor
-    # typeChecker = TypeChecker()
-    # typeChecker.visit(ast)  # or alternatively ast.accept(typeChecker)
+    for a in parser.parse(tokens):
+        a.printTree()
+        try:
+            typeChecker.visit(a)
+        except Exception as e:
+            # print(e)
+            pass

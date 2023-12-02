@@ -4,3 +4,9 @@ D = A.+B' ;   # add element-wise A with transpose of B
 for j = 1:10 
     print j;
 
+i = 1;
+j = 2;
+
+A[i,j] = 0;
+
+x = i >= j;

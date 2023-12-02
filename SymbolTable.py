@@ -1,41 +1,40 @@
+from dataclasses import dataclass
+from typing import Optional, Any
+
+
+@dataclass
 class Symbol:
-    pass
-
-
-class VariableSymbol(Symbol):
-    def __init__(self, name, type):
-        pass
-
-    #
+    type: str
+    value: Any
+    dims: Optional[list[int]] = None
 
 
 class SymbolTable(object):
-    def __init__(self, parent, name):  # parent scope and symbol table name
-        pass
+    def __init__(self, parent, name):
+        # parent scope and symbol table name
+        self.parent_scope = parent
+        self.name = name
+        self.symbols = {}
 
-    #
+    def put(self, name, symbol: Symbol):
+        # put variable symbol or fundef under <name> entry
+        self.symbols[name] = symbol
 
-    def put(self, name, symbol):  # put variable symbol or fundef under <name> entry
-        pass
-
-    #
-
-    def get(self, name):  # get variable symbol or fundef from <name> entry
-        pass
-
-    #
+    def get(self, name) -> Symbol:
+        # get variable symbol or fundef from <name> entry
+        if name in self.symbols:
+            return self.symbols[name]
+        elif self.parent_scope is not None:
+            return self.parent_scope.get(name)
+        else:
+            print(f"'{name}' not found in scope!")
+            return None
 
     def getParentScope(self):
-        pass
-
-    #
+        return self.parent_scope
 
     def pushScope(self, name):
-        pass
-
-    #
+        return SymbolTable(parent=self, name=name)
 
     def popScope(self):
-        pass
-
-    #
+        return self.parent_scope

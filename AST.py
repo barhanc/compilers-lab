@@ -99,7 +99,8 @@ class Assignment(Statement):
 @dataclass
 class RefAssignment(Statement):
     op: str
-    ref: Reference
+    id: Id
+    idx: ExpressionSeq
     val: Expression
     lineno: int = 0
 

@@ -22,6 +22,9 @@ ttypes["*"]["int"]["float"] = "float"
 ttypes["*"]["float"]["int"] = "float"
 ttypes["*"]["float"]["float"] = "float"
 
+ttypes["*"]["str"]["int"] = "str"
+ttypes["*"]["int"]["str"] = "str"
+
 ttypes["/"]["int"]["int"] = "float"
 ttypes["/"]["int"]["float"] = "float"
 ttypes["/"]["float"]["int"] = "float"
@@ -99,6 +102,7 @@ ttypes["/="]["float"]["int"] = "float"
 ttypes["/="]["float"]["float"] = "float"
 
 ERR = "\033[91m" + "Error" + "\033[0m"
+ERR_STATUS = 0
 
 
 class NodeVisitor:
@@ -205,9 +209,9 @@ class TypeChecker(NodeVisitor):
             case "-" | ".-":
                 value = sym1.value - sym2.value
             case "*" | ".*":
-                value = sym1.value + sym2.value
-            case "*" | ".*":
-                value = sym1.value + sym2.value
+                value = sym1.value * sym2.value
+            case "/" | "./":
+                value = sym1.value / sym2.value
             case "<":
                 value = sym1.value < sym2.value
             case ">":

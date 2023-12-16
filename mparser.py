@@ -57,9 +57,7 @@ class MyParser(Parser):
 
     @_(*ref_assignment)
     def statement(self, p):
-        return RefAssignment(
-            op=p[4], ref=Reference(expr=Id(p[0]), idx=p.exprseq), val=p.expr, lineno=p.lineno
-        )
+        return RefAssignment(op=p[4], id=Id(p[0]), idx=p.exprseq, val=p.expr, lineno=p.lineno)
 
     @_(
         'IF "(" expr ")" statement %prec IFX',

@@ -8,3 +8,6 @@ D[0, 0] = 42;
 D[1, 2] = 7;
 print D;
 print D[2, 2];
+
+D = D';
+print D;

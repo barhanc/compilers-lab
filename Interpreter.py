@@ -28,7 +28,7 @@ bin_operators = {
 }
 
 unary_operators = {
-    "'": lambda x: x.T,
+    "TRANSPOSE": lambda x: x.T,
     "-": lambda x: -x,
 }
 

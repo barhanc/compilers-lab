@@ -30,6 +30,9 @@ if __name__ == "__main__":
             # print(e)
             pass
 
+    if typeChecker.status > 0:
+        exit(0)
+
     tokens = lexer.tokenize(text=text)
     interpreter = Interpreter()
     for a in parser.parse(tokens):

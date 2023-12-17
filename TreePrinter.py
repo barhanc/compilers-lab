@@ -38,7 +38,7 @@ class TreePrinter:
 
     @addToClass(AST.Expression)
     def printTree(self, indent=0):
-        print("|  " * indent + f"{self.val}")
+        print("|  " * indent + f"{self.value}")
 
     @addToClass(AST.ExpressionSeq)
     def printTree(self, indent=0):
@@ -82,7 +82,9 @@ class TreePrinter:
     @addToClass(AST.RefAssignment)
     def printTree(self, indent=0):
         print("|  " * indent + f"{self.op}")
-        self.ref.printTree(indent + 1)
+        self.id.printTree(indent + 1)
+        print("|  " * (indent + 2) + f"REF")
+        self.idx.printTree(indent + 2)
         self.val.printTree(indent + 1)
 
     @addToClass(AST.If)

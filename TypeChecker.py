@@ -109,6 +109,7 @@ class NodeVisitor:
     def __init__(self) -> None:
         self.scope: SymbolTable = SymbolTable(None, "global")
         self.loop_cnt = 0
+        self.status = 0
 
     def visit(self, node):
         method = "visit_" + node.__class__.__name__
@@ -165,6 +166,7 @@ class TypeChecker(NodeVisitor):
                 + f" (Line {node.lineno}) "
                 + f"Invalid operand {sym.type} for operator {node.operand}"
             )
+            self.status += 1
             return None
 
         if node.operand == "'" and sym.type[:6] != "vector" and len(sym.dims) != 2:
@@ -173,6 +175,7 @@ class TypeChecker(NodeVisitor):
                 + f" (Line {node.lineno}) "
                 + f"Invalid operand {sym.type} for operator {node.operand}"
             )
+            self.status += 1
             return None
 
         match node.operator:
@@ -192,6 +195,7 @@ class TypeChecker(NodeVisitor):
                 + f" (Line {node.lineno}) "
                 + f"Invalid types: {sym1.type} {sym2.type} for operand {op}"
             )
+            self.status += 1
             return None
 
         if sym1.dims != sym2.dims:
@@ -200,6 +204,7 @@ class TypeChecker(NodeVisitor):
                 + f" (Line {node.lineno}) "
                 + f"Incompatible dimensions: {sym1.dims} {sym2.dims}"
             )
+            self.status += 1
             return None
 
         value = None
@@ -240,6 +245,7 @@ class TypeChecker(NodeVisitor):
                         print(
                             ERR + f" (Line {node.lineno}) " + f"Invalid argument type: {sym.type}"
                         )
+                        self.status += 1
                         return None
                 return Symbol(
                     "vector[float]",
@@ -254,6 +260,7 @@ class TypeChecker(NodeVisitor):
                         print(
                             ERR + f" (Line {node.lineno}) " + f"Invalid argument type: {sym.type}"
                         )
+                        self.status += 1
                         return None
                 return Symbol(
                     "vector[float]",
@@ -265,6 +272,7 @@ class TypeChecker(NodeVisitor):
                 sym = self.visit(node.arg)
                 if sym.type != "int":
                     print(ERR + f" (Line {node.lineno}) " + f"Invalid argument type: {sym.type}")
+                    self.status += 1
                     return None
                 return Symbol(
                     "vector[float]",
@@ -282,10 +290,12 @@ class TypeChecker(NodeVisitor):
 
         if len(set(types)) != 1:
             print(ERR + f" (Line {node.lineno}) " + f"Heterogeneous arrays are not supported")
+            self.status += 1
             return None
 
         if len(set(tuple(dim) if dim is not None else dim for dim in dims)) != 1:
             print(ERR + f" (Line {node.lineno}) " + f"Incompatible dimensions")
+            self.status += 1
             return None
 
         return Symbol(
@@ -300,11 +310,13 @@ class TypeChecker(NodeVisitor):
 
         if len(sym.dims) != len(idxs):
             print(ERR + f" (Line {node.lineno}) " + "Incompatible array axes")
+            self.status += 1
             return None
 
         for i, idx in enumerate(idxs):
             if idx.value < 0 or idx.value >= sym.dims[i]:
                 print(ERR + f" (Line {node.lineno}) " + f"Index out of bounds")
+                self.status += 1
                 return None
 
         return Symbol(
@@ -325,10 +337,12 @@ class TypeChecker(NodeVisitor):
                     + f" (Line {node.lineno}) "
                     + f"Invalid types: {sym_l.type} {sym_r.type} for operand {node.op}"
                 )
+                self.status += 1
                 return None
 
             if sym_l.dims != sym_r.dims:
                 print(ERR + f" (Line {node.lineno}) " + "Incompatible dimension")
+                self.status += 1
                 return None
 
             value = None
@@ -374,10 +388,12 @@ class TypeChecker(NodeVisitor):
     def visit_Break(self, node: AST.Break):
         if self.loop_cnt == 0:
             print(ERR + f" (Line {node.lineno}) " + "'break' outside loop")
+            self.status += 1
 
     def visit_Continue(self, node: AST.Continue):
         if self.loop_cnt == 0:
             print(ERR + f" (Line {node.lineno}) " + "'continue' outside loop")
+            self.status += 1
 
     def visit_For(self, node: AST.For):
         self.scope = self.scope.pushScope("for")
@@ -387,6 +403,7 @@ class TypeChecker(NodeVisitor):
 
         if sym_i.type != "int" or sym_j.type != "int":
             print(ERR + f" (Line {node.lineno}) " + "Invalid type in range")
+            self.status += 1
             return None
 
         self.scope.put(node.id.name, Symbol("int", value=sym_i.value))

@@ -4,7 +4,7 @@ import sly.yacc as yacc
 from scanner import MyLexer
 from mparser import MyParser
 from TreePrinter import TreePrinter
-from TypeChecker import TypeChecker
+from TypeChecker import TypeChecker, ERR_STATUS
 
 
 if __name__ == "__main__":
@@ -27,5 +27,4 @@ if __name__ == "__main__":
         try:
             typeChecker.visit(a)
         except Exception as e:
-            # print(e)
             pass
